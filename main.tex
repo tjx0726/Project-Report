@@ -20,6 +20,9 @@
 \usepackage[]{algorithm}
 \usepackage[]{algpseudocode}
 
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
 \makeatletter
 \newcommand{\StatexIndent}[1][3]{%
   \setlength\@tempdima{\algorithmicindent}%
@@ -405,9 +408,13 @@
     
         \subsection{Overall}
         
-            Figure~
+            Figure~\ref{fig:system1} shows the overall system. As the same as most artificial intelligent systems, the whole system consists of an agent and an environment. 
             
-            
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=\textwidth]{agent_env.png}
+                \caption{\label{fig:system1}Overall System.}
+            \end{figure}
         
         
         \subsection{Agent}
