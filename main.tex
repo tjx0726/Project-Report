@@ -1,0 +1,438 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage{url}
+
+\usepackage{titling}
+
+\usepackage{titlesec}
+\newcommand{\sectionbreak}{\clearpage}
+
+\usepackage{amsmath,amssymb}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\argmax}{argmax}
+
+\usepackage{textcomp}
+
+\usepackage{enumitem}
+\setlist{nosep}
+
+\usepackage[]{algorithm}
+\usepackage[]{algpseudocode}
+
+\makeatletter
+\newcommand{\StatexIndent}[1][3]{%
+  \setlength\@tempdima{\algorithmicindent}%
+  \Statex\hskip\dimexpr#1\@tempdima\relax}
+\algdef{S}[WHILE]{WhileNoDo}[1]{\algorithmicwhile\ #1}%
+\makeatother
+
+% \makeatletter
+% \def\BState{\State\hskip-\ALG@thistlm}
+% \makeatother
+
+
+
+\title{Training Computers to Build LEGO Models using Reinforcement Learning with Deep Q-Network}
+\author{Jiaxing Tong }
+\date{May 2017}
+
+\begin{document}
+    \pagenumbering{gobble}
+    \maketitle
+    
+    \begin{abstract}
+        This project shows a way to train a computer (agent) to
+        build a LEGO model in a simulated LEGO environment 
+        according to a given LEGO model or a picture. Deep Q learning \cite{human-level,DQN}
+        is an algorithm which combines deep learning and reinforcement
+        learning and uses artificial neural networks to train the
+        agent in a specific simulated environment. This project shows
+        a way to build up a LEGO environment along with a suitable
+        neural network. Then, by expanding the environment and
+        upgrading the algorithm, the agent can finally build a 3D
+        LEGO model according to a real-world picture. 	
+    \end{abstract}
+    
+    \newpage
+    \tableofcontents
+    \newpage
+
+    \pagenumbering{arabic}
+    \section{Introduction}
+        \subsection{Overview}
+            As computer hardware has become much more powerful than that
+            in the last decade, the high performance of computers gave
+            rise to the popularity of machine learning, especially its
+            uses in artificial intelligence. A group of scientists from
+            DeepMind suggested a new way, which combined deep learning
+            and reinforcement learning, to train an agent to learn to
+            play Atari games \cite{intro-rl} in 2015. After \cite{intro-rl} had been published,
+            many people tried to train computers to play different video
+            games, such as games on Atari, Flappy Bird \cite{flappy-bird1,flappy-bird2}, etc., using
+            this algorithm. However I believed that this algorithm had
+            some other application, so I tried to create an agent to learn
+            to build LEGO models. 
+            
+            This project shows a way to train an agent to learn to build
+            a LEGO model using as input only the rendered image of current
+            model and a value given by a pre-defined reward function which
+            evaluates the gap between current model and the target model.
+            Initially the agent is offered the exact bricks required to
+            build the target model. This is similar to the experience when
+            we purchase a box of a LEGO model from a store, where the bricks
+            in the box are exactly the bricks of which the model consists,
+            and pour the bricks onto a table and then assemble them piece
+            by piece. The agent may choose a brick to move one step at each
+            time. 
+            
+            In the later stage, the agent was upgraded and was able to pick
+            a best brick from a large pool of bricks with different colours
+            and put it to a best place at each step. Compared to the previous
+            procedure, this is more similar to the process where a LEGO expert
+            who has enough LEGO bricks and uses them to build a model from
+            scratch. 
+            
+            Here follows a rough outline of how the agent works: 
+            
+            \begin{enumerate}[leftmargin=1.5cm]
+                \item Initially we have an untrained Q-network, a target
+                model, a current model and a rendered image for each model.
+                \item The agent chooses a best action according to the Q
+                values given by the Q-network.
+                \item The agent inputs the chosen action to the LEGO
+                environment, and get a model after that action along with
+                the rendered image of this model.
+                \item The agent compares the model we get and the target
+                model and get a reward value from the reward function.
+                \item Put the reward value and other useful information
+                into the replay pool.
+                \item If there are enough replays in the replay pool, update
+                the Q-network using some randomly picked replays from the
+                replay pool.
+                \item Repeat step 2 to 6 until the agent is able to build the
+                target model or a pre-set maximum number of steps has been reached.
+            \end{enumerate}
+            
+        \subsection{Purpose}
+            The purpose of this project is to design an artificial intelligence
+            and a simulated LEGO environment, improve the reward function and upgrade
+            the LEGO environment so that it is more similar to the way where humans
+            play with LEGO. 
+            
+            Everyone may easily get a real-world picture of an object, but it’s hard
+            for a person who is lacking designing skills to design a LEGO model using
+            some software such as LEGO DIGITAL DESIGNER. The project also aims to find
+            such a way that the agent would be able to build the LEGO model according
+            to a real world picture of an object. In order to build a 3D model, the
+            picture might be captured by a 3D camera (which gives the picture a depth
+            channel), or the system might require a set of multi-view pictures as its
+            input. There are still some imperfections in the system, which can be
+            improved in the future.
+            
+        \subsection{Project Road Map}
+            This project aims to build up a complete system consisting of main code,
+            a neural network, a simulated LEGO environment and a rendering program.
+            As the goal of this project is very ambitious and the whole system is
+            complicated, I built the system part by part and upgraded some modules
+            to improve the performance. 
+            
+            I will now explain the whole system in the following order. 
+            
+            Firstly, in the Background section, I will define some symbols which
+            will be used in the rest part of the report I will also introduce some
+            essential background knowledge of reinforcement learning as it is not
+            fully covered in the machine learning course. Then, I will explain deep
+            reinforcement learning, the most important algorithm in the whole system. 
+            
+            In the Design section, I will give a graphical overview of the entire
+            system which reflects the inter-communication between each module and
+            the outline of the algorithm. Then I will explain how the whole system
+            works, how the neural network has been constructed, and how the individual
+            modules work, the roles they play and how do they interact with each other.
+            Moreover, if some modules have been upgraded, I will explain the reason why
+            I upgraded them and the improvement after upgrade. 
+            
+            Having explained the whole system, I will show some testing results and
+            analyse the results to show the actual improvement of the system. Finally,
+            I will draw conclusions from the results and the analysis that I have done,
+            and then reveal some imperfections which can be further improved.
+
+
+
+
+
+    \section{Background}
+    
+        \subsection{Definition}
+        
+        (Here I will include some symbols which I use in the report. Not finished.)
+        action space
+        
+        action
+        
+        state space
+        
+        state
+        
+        value in rl
+        
+        optimal value in rl
+        
+        policy
+        
+        reward
+        
+        reward for an action
+        
+        overall reward
+        
+        Q values
+        
+        
+        
+        
+        
+        
+        
+        \subsection{Reinforcement Learning}
+            In machine learning, reinforcement learning is an area
+            inspired by behaviourist psychology \cite{thorndike1898animal}
+            and neuroscience \cite{Schultz_1997}. It concerns how agents may take
+            actions in an environment corresponding to the responses of
+            the environment so as to maximise the total reward \cite{intro-rl}.
+            The whole process mimics how animals learn to react to
+            an environment.
+            
+            A reinforcement learning model consists of: \cite{intro-rl}
+            \begin{enumerate}[leftmargin=1.5cm]
+                \item a set of environment states $S$;
+                \item a set of actions $A$;
+                \item rules of transitioning between states;
+                \item rules that determine the scalar immediate reward
+                of a transition; and
+                \item rules that describe what the agent observes.
+            \end{enumerate}
+            
+            
+            Assume the problem is episodic. An episode starts when the
+            problem starts in an initial state and ends when some terminal
+            states is reached. We also assume each episode is finite. In
+            other words, whichever the actions are taken by the agent, 
+            the problem always terminates at some point. We define a policy
+            as a mapping to some probability distribution over all possible
+            actions. Hence, the expectation of the total reward for any
+            policy is well-defined.
+            
+            The expected return $\rho^\pi$ to policy $\pi$ is:
+            \begin{equation*}
+                \rho^\pi = \E [R|\pi]
+            \end{equation*}
+            where the return value R is defined by:
+            \begin{equation*}
+                R=\sum_{t=0}^{N-1} r_{t+1}
+            \end{equation*}
+            where $r_{t+1}$ is the immediate reward after the $t$-th transition. Here, $N$ denotes the time step when a terminal state is reached. \cite{intro-rl} Sometimes, in order to control the number of steps, the reward at each step can be multiplied by a discount factor $\gamma$, so R can also be defined by:
+            \begin{equation*}
+                R=\sum_{t=0}^{N-1} \gamma r_{t+1}
+            \end{equation*}
+            
+            There are many algorithms for reinforcement learning \cite{intro-rl}. In this project, \textbf{Value Function approaches} is related to Deep Q-Learning algorithm.
+            
+            Value function approaches aim to find a policy which maximises the overall reward value. 
+            
+            Let $V^*$ be the optimality and it is defined as:
+            
+            \begin{equation*}
+                V^*(s) = \max_\pi V^\pi (s)
+            \end{equation*}
+            where $V^\pi$ denotes the value of a policy $\pi$:
+            
+            \begin{equation*}
+                V^\pi(s) = \E[R|s,\pi]
+            \end{equation*}
+            where $R$ is the random return with respect to the policy $\pi$ from the initial state $s$.
+            
+            Moreover, the state-values can be updated to action-values, and the algorithm becomes Q-Learning.\cite{Watkins:1989} And the Q-values are defined as:\cite{Q-l}
+            
+            \begin{equation*}
+                Q^\pi(s,a) = r_s(a) + \gamma \sum_{a'}\E[s,a'|\pi]V^\pi(a').
+            \end{equation*}
+        
+        
+        
+        \subsection{Deep Learning}
+        
+            Deep Learning is a class of machine learning in which artificial neural networks (also known as neural networks) are used to extract and transform features from raw data. A neural networks is a flow of many layers, and each layer consists a lot of non-linear processing units which are also called as nodes or neurons. Each neural network has an input layer, an output layer and one or more hidden layers. \cite{deep-learning-methods-and-applications,Deep-Learning, Schm14}
+            
+            In a neural network, neurons in the input layer receive the input data and output to next layer. Neurons in a hidden layer receive the output from the previous layer, and output values after some linear or non-linear transformations, according to parameters of neurons, to the next layer. And finally, the output layer receives values and output to the user. \cite{Deep-Learning,Schmidhuber_2015,Schm14,deep-learning-methods-and-applications,Bengio_2009}
+            
+            In this project, a deep neural network is used to simulate a function which returns Q values\cite{human-level}, so the network is also called Q-network.
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        
+        
+        
+        \subsection{Deep Reinforcement Learning, Deep Q-Learning and Deep Q-Networks}
+        
+            Deep Reinforcement Learning (also known as Deep Q-learning) is an 
+            machine learning algorithm which was posted by DeepMind on their 
+            website in 2013. \cite{Deep-RL} DeepMind then published an article about deep 
+            reinforcement learning in Nature in 2015. \cite{human-level} In this article, they described
+            an algorithm called Deep Q-network implemented deep reinforcement learning.
+            
+            Deep Reinforcement Learning is a combination of Deep Learning
+            and Reinforcement Learning, which integrates both their features. 
+            DeepMind wanted to use Deep Reinforcement Learning to create artificial
+            agents which achieve a similar level of performance and generality.
+            The Agents learn by themselves to achieve successful strategies leading
+            to a greatest long-term rewards (feature of reinforcement learning) and
+            learn their own knowledge directly from raw inputs, such as vision 
+            (feature of deep learning). \cite{DQN}
+            
+            In Deep Q-learning, we are not concerning immediate reward values for each transition,
+            but we are trying to maximise long-term reward values. There is also a set of Q-values for each state-action pair. Therefore a Deep Q-learning model
+            consists of:
+            \begin{enumerate}[leftmargin=1.5cm]
+                \item a set of environment states $S$;
+                \item a set of actions $A$;
+                \item a set of Q-values $Q$;
+                \item rules of transitioning between states;
+                \item rules that determine the scalar immediate reward
+                of a state from the nearest final state; and
+                \item rules that describe what the agent observes.
+            \end{enumerate}
+            
+            The agent is able to do some action in the environment; the agent can perceive any
+            feedback from the environment; and most importantly, the agent has a Q-network,
+            which takes the feedback as an input and outputs values for different actions.
+            The agent can then take the best action accordingly. 
+            
+            The whole process simulates humans (or other animals). When humans are in an
+            environment, humans are able to do some action in the environment; humans can perceive any feedback from the environment by means of senses of sight, hearing, touch (maybe taste and smell); and humans have brains which collect the information from sense organs and tell bodies to take some reactions.
+            
+            With this in mind, we may consider the problem in which the agent interacts with the environment. The agent receives an observation from the environment, selects an action, receives a reward from the environment, then receives the next observation and keeps doing these. The goal of the agent is to select actions at each state so that it can maximise cumulative future reward. \cite{human-level} We achieve this by using the Q-network. The Q-network is a deep convolutional neural network which approximates the optimal action-value function
+            
+            \begin{equation*}
+                Q^*(s,a) = \max_\pi \E[r_t+\gamma r_{t+1}+ \gamma^2 r_{t+2}+...|s_t=s, a_t=a, \pi]
+            \end{equation*}
+            which maximises the overall rewards discounted by $\gamma$ at each time step $t$. This is achieved by a behaviour policy $\pi = P(a|s)$, after an observation $s$ and taking an action $a$.\cite{human-level}
+            
+            The agent has a limited memory to store replays (experiences). Each replay is a tuple $e_t = (s_{t}, a_t, r_t, s_{t+1})$ where $s_{t}$ is the state at time t, $a_t$ is the action taken after $s_t$, $r_t$ is the reward after $a_t$ had been taken, and $s_{t+1}$ is the state after $a_t$ had been taken from $s_t$. All the replays $e_1$ to $e_t$ are stored in a replay pool $D_t$.  When the number of replays in the pool reaches a threshold, the agent can uniformly pick one or more of these replays, wrap them as a mini-batch and train the Q-network with the mini-batch. 
+            
+            During learning, Q-learning updates are applied on the mini-batch. For each iteration $i$ the following loss function is used to update the Q-network:
+            
+            \begin{equation*}
+                L_i(\theta_i) = \E_{(s,a,r,s')}[(r+\gamma\max_{a'}Q(s',a';\theta^-_i)-Q(s,a;\theta_i))^2]
+            \end{equation*}
+            where $\gamma$ is the discount factor mentioned before, $\theta_i$ are the parameters of the Q-network at iteration $i$ and $\theta^-_i$ are the parameters used to compute the target at iteration $i$. \cite{human-level}
+            
+            The overall DQN algorithm is shown by Algorithm~\ref{alg:dqn}.
+    
+            
+            \begin{algorithm}
+                \caption{Deep Q-learning with experience replay  (Quoted from \cite{human-level})}\label{alg:dqn}
+                \begin{algorithmic}[1]
+                    \State Initialise replay memory $D$ to capacity $N$
+                    \State Initialise action-value function $Q$ with random weights $\theta$
+                    \State Initialise target action-value function $\hat{Q}$ with weights $\theta^- = \theta$
+                    
+                    \For {episode = 1, $M$}
+                        \State Initialise sequence $s_1 = {x_1}$ and preprocessed sequence $\phi_1 = \phi(s_1)$
+                        \For{$t=1,T$}
+                            \State With probability $\epsilon$ select a random action $a_t$
+                            \State otherwise select $a_t = \argmax_aQ(\phi(s_t), a;\theta)$
+                            \State Execute action $a_t$ in emulator and observe reward $r_t$ and image $x_{t+q}$
+                            \State Set $s_{t+1} = s_t,a_t,x_{t+1}$ and preprocess $\phi_{t+1}=\phi(s_{t+1})$
+                            \State Store transition ($\phi_t,a_t,r_t,\phi_{t+1}$) in $D$
+                            \State Sample random mini-batch of transitions ($\phi_j,a_j,r_j,\phi_{j+1}$) from $D$
+                            \State Set $
+                                    y_j= 
+                                    \begin{cases}
+                                        r_j    & \parbox[t]{.15\textwidth}{\text{episode terminates at step } j+1}\\
+                                        r_j+\gamma\max_{a'}\hat{Q}(\phi_{j+1},a';\theta^-) & \text{otherwise}
+                                    \end{cases}
+                                    $
+                            \State Perform a gradient descent step on $(y_j-Q(\phi_j,a_j;\theta))^2$ with respect
+                            \StatexIndent[2] to the network parameters $\theta$
+                            \State Every $C$ steps reset $\hat{Q}=Q$                        
+                        \EndFor
+                    \EndFor
+                \end{algorithmic}
+            \end{algorithm}
+                        
+            
+            
+        
+        \subsection{LEGO Environment}
+        
+            The LEGO Group offers a virtual building software, LEGO Digital Designer.\cite{ldd} The software supports a virtual way to design, build and observe LEGO models, and store the LEGO models into \textit{.lxfml} format files. This format is essentially an xml format. 
+            
+            However, this software can't be running on command line or any Linux system. As a result, I should design a virtual LEGO environment by myself. Thanks to the format, we can parse the xml tree from the \textit{.lxfml} files and extract some other useful data from the software. The \textit{.lxfml} files store the information of every brick, including a type (shape) of the brick, a texture of the brick and a linear translation matrix of the brick. With all those information, I built up a LEGO environment in LUA, which offers all the command needed in the project and finally encapsulated in a class so the agent can communicate with the environment.
+            
+            Even though the agent cannot communicate directly with LEGO Digital Designer, we can still use the software to open \textit{.lxfml} files, so that we can observe models constructed by the agent and do some analysis. 
+            
+            I will explain in detail how I designed the environment in the Design section.
+        
+        \subsection{Others}
+            I will also introduce some other tools or packages which I used in the project.
+            (All the tools and packages are free and open-source.)
+            
+            \subsubsection{Blender Python}
+                Blender Python (also known as bpy) is a package for Python. The package includes most tools in Blender. Thanks to bpy, we can use Blender on command line by using Python scripts. 
+                
+                In this project, I used bpy to render models into images and depth maps.
+            
+            \subsubsection{Optical Flow}
+                Optical flow algorithm is commonly used in computer vision. It measures the movements of objects in two images. I used optical flow algorithm as a part of the reward function since it can measure the movements of bricks and also give a scalar magnitude for each movement. I will explain this in detail about how I used optical flow algorithm to evaluate the similarity of two images and finally return a reward value.
+                
+                Although there are several different optical flow algorithms, I chose one particular algorithm, TV-L1 \cite{tvl1}, as it worked well in early tests. This algorithm is available in the OpenCV library.
+                
+                As this algorithm is not an important part in my project, I will not discuss the principle of the algorithm in this report.
+            
+    \section{Requirements}
+        
+    \section{Design}
+    
+        In this section, I will explain how the whole system works, how each module (or class) works and how the modules (or classes) interact with others.
+    
+        \subsection{Overall}
+        
+        
+        \subsection{Agent}
+        
+        
+        \subsection{Deep Q Network}
+        
+        
+        \subsection{LEGO Environment}
+        
+        
+        \subsection{Render}
+        
+        
+        \subsection{Interaction}
+    
+    \section{Testing}
+    
+    \section{Results}
+    
+    \section{Conclusions}
+    
+    \section{Future Works}
+    
+    \section{Acknowledgements}
+    
+    \bibliographystyle{alpha}
+    \bibliography{LEGO}
+    \nocite{*}
+
+
+\end{document}
