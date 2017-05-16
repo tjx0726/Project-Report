@@ -376,11 +376,11 @@
         
         \subsection{LEGO Environment}
         
-            The LEGO Group offers a virtual building software, LEGO Digital Designer.\cite{ldd} The software supports a virtual way to design, build and observe LEGO models, and store the LEGO models into \textit{.lxfml} format files. This format is essentially an xml format. 
+            The LEGO Group offers a virtual building software, LEGO Digital Designer.\cite{ldd} The software supports a virtual way to design, build and observe LEGO models, and store the LEGO models into \textit{.lxfml} or \textit{.lxf} format files. This format is essentially an xml format. 
             
-            However, this software can't be running on command line or any Linux system. As a result, I should design a virtual LEGO environment by myself. Thanks to the format, we can parse the xml tree from the \textit{.lxfml} files and extract some other useful data from the software. The \textit{.lxfml} files store the information of every brick, including a type (shape) of the brick, a texture of the brick and a linear translation matrix of the brick. With all those information, I built up a LEGO environment in LUA, which offers all the command needed in the project and finally encapsulated in a class so the agent can communicate with the environment.
+            However, this software can't be running on command line or any Linux system. As a result, I should design a virtual LEGO environment by myself. Thanks to the format, we can parse the xml tree from the \textit{.lxfml} or \textit{.lxf} files and extract some other useful data from the software. The \textit{.lxfml} or \textit{.lxf} files store the information of every brick, including a type (shape) of the brick, a texture of the brick and a linear translation matrix of the brick. With all those information, I built up a LEGO environment in LUA, which offers all the command needed in the project and finally encapsulated in a class so the agent can communicate with the environment.
             
-            Even though the agent cannot communicate directly with LEGO Digital Designer, we can still use the software to open \textit{.lxfml} files, so that we can observe models constructed by the agent and do some analysis. 
+            Even though the agent cannot communicate directly with LEGO Digital Designer, we can still use the software to open \textit{.lxfml} or \textit{.lxf} files, so that we can observe models constructed by the agent and do some analysis. 
             
             I will explain in detail how I designed the environment in the Design section.
         
@@ -415,7 +415,7 @@
                 \caption{\label{fig:system1}Overall System.}
             \end{figure}
             
-            The environment consists of a simulated LEGO environment and a render. The simulated LEGO environment offers the agent actions. The simulated LEGO environment can construct LEGO models according to the action commands sent from the agent. 
+            The environment consists of a simulated LEGO environment and a renderer. The simulated LEGO environment offers the agent actions. According to the action commands sent from the agent, LEGO models can be rigged up in the simulated LEGO environment. The simulated LEGO environment can also import a model from a \textit{.lxfml} or \textit{.lxf} file, or export the current model to a \textit{.lxfml} or \textit{.lxf} file. The renderer can then input a \textit{.lxfml} or \textit{.lxf} file, and then render the model into an image which can be percepted by the agent. 
             
             % \let\labelitemi\labelitemii
 
