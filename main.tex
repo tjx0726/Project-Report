@@ -47,7 +47,7 @@
     \begin{abstract}
         This project shows a way to train a computer (agent) to
         build a LEGO model in a simulated LEGO environment 
-        according to a given LEGO model or a picture. Deep Q learning \cite{human-level,DQN}
+        according to a given LEGO model or a picture. Deep Q-learning \cite{human-level,DQN}
         is an algorithm which combines deep learning and reinforcement
         learning and uses artificial neural networks to train the
         agent in a specific simulated environment. This project shows
@@ -62,6 +62,7 @@
     \newpage
 
     \pagenumbering{arabic}
+    
     \section{Introduction}
         \subsection{Overview}
             As computer hardware has become much more powerful than that
@@ -77,37 +78,29 @@
             some other application, so I tried to create an agent to learn
             to build LEGO models. 
             
-            This project shows a way to train an agent to learn to build
-            a LEGO model using as input only the rendered image of current
-            model and a value given by a pre-defined reward function which
-            evaluates the gap between current model and the target model.
-            Initially the agent is offered the exact bricks required to
-            build the target model. This is similar to the experience when
-            we purchase a box of a LEGO model from a store, where the bricks
-            in the box are exactly the bricks of which the model consists,
-            and pour the bricks onto a table and then assemble them piece
-            by piece. The agent may choose a brick to move one step at each
-            time. 
+            This project shows a way to train an agent to learn to rig up a LEGO model in a simulated environment using as input only the rendered image of the model which the agent has currently built and a value given by a pre-defined reward function which evaluates the gap between current model and the target model. Initially, the agent is offered the exact bricks required to build the target model. This is in a similar way where people purchase a box of a LEGO model from a store, where the bricks in the box are exactly the bricks of which the model consists, and pour the bricks onto a table and then assemble them piece by piece. The agent may choose a brick to move one step at each time. 
             
             In the later stage, the agent was upgraded and was able to pick
             a best brick from a large pool of bricks with different colours
-            and put it to a best place at each step. Compared to the previous
+            and put it to the best place at each step. Compared to the previous
             procedure, this is more similar to the process where a LEGO expert
             who has enough LEGO bricks and uses them to build a model from
             scratch. 
             
+            I also added some simple physics into the LEGO environment, and observed if the agent can also learn to rig up models in an environment which is closer to the real world. 
+            
             Here follows a rough outline of how the agent works: 
             
             \begin{enumerate}[leftmargin=1.5cm]
-                \item Initially we have an untrained Q-network, a target
+                \item Initially, we have an untrained Q-network, a target
                 model, a current model and a rendered image for each model.
-                \item The agent chooses a best action according to the Q
+                \item The agent chooses the best action according to the Q
                 values given by the Q-network.
                 \item The agent inputs the chosen action to the LEGO
                 environment, and get a model after that action along with
                 the rendered image of this model.
                 \item The agent compares the model we get and the target
-                model and get a reward value from the reward function.
+                model and gets a reward value from the reward function.
                 \item Put the reward value and other useful information
                 into the replay pool.
                 \item If there are enough replays in the replay pool, update
@@ -134,7 +127,7 @@
             improved in the future.
             
         \subsection{Project Road Map}
-            This project aims to build up a complete system consisting of main code,
+            This project aims to build up a complete system consisting of main codes,
             a neural network, a simulated LEGO environment and a rendering program.
             As the goal of this project is very ambitious and the whole system is
             complicated, I built the system part by part and upgraded some modules
@@ -142,19 +135,19 @@
             
             I will now explain the whole system in the following order. 
             
-            Firstly, in the Background section, I will define some symbols which
+            Firstly, in the 'Background' section, I will define some symbols which
             will be used in the rest part of the report I will also introduce some
             essential background knowledge of reinforcement learning as it is not
             fully covered in the machine learning course. Then, I will explain deep
             reinforcement learning, the most important algorithm in the whole system. 
             
-            In the Design section, I will give a graphical overview of the entire
+            In the 'Design' section, I will give a graphical overview of the entire
             system which reflects the inter-communication between each module and
             the outline of the algorithm. Then I will explain how the whole system
             works, how the neural network has been constructed, and how the individual
             modules work, the roles they play and how do they interact with each other.
             Moreover, if some modules have been upgraded, I will explain the reason why
-            I upgraded them and the improvement after upgrade. 
+            I upgraded them and the improvement after the upgrade. 
             
             Having explained the whole system, I will show some testing results and
             analyse the results to show the actual improvement of the system. Finally,
@@ -352,7 +345,7 @@
                         \For{$t=1,T$}
                             \State With probability $\epsilon$ select a random action $a_t$
                             \State otherwise select $a_t = \argmax_aQ(\phi(s_t), a;\theta)$
-                            \State Execute action $a_t$ in emulator and observe reward $r_t$ and image $x_{t+q}$
+                            \State Execute action $a_t$ in emulator and observe reward $r_t$ and image $x_{t+1}$
                             \State Set $s_{t+1} = s_t,a_t,x_{t+1}$ and preprocess $\phi_{t+1}=\phi(s_{t+1})$
                             \State Store transition ($\phi_t,a_t,r_t,\phi_{t+1}$) in $D$
                             \State Sample random mini-batch of transitions ($\phi_j,a_j,r_j,\phi_{j+1}$) from $D$
@@ -401,21 +394,137 @@
                 As this algorithm is not an important part in my project, I will not discuss the principle of the algorithm in this report.
             
     \section{Requirements}
-        
+        \newpage
     \section{Design}
     
-        In this section, I will explain how the whole system works, how each module (or class) works and how the modules (or classes) interact with others.
+        In this section, I will explain how the whole system works, how each module (or class) works and how the modules (or classes) interact with others. I will also explain how I expanded each module and upgraded the whole algorithm. 
+        
+        There are several stages in my project. 
+        Initially the environment only supported 2D, so the agent could only move bricks in a 2D plane. Then I expanded the renderer so that the environment supported 3D, and correspondingly, the agent might move bricks in a 3D space. I also upgraded the environment so that some simple physical laws are implemented. 
+        
+        After that, I tried different reward functions, so the input to the whole system could be a real life image, rather than a LEGO model. Then I upgraded the whole system and the algorithm, so that the agent could play with more bricks.
+               
+        In the end, the system can train an agent to build a LEGO model according to a real-life picture. I will show you a final achievement in the 'Results' section.
     
         \subsection{Overall}
         
-            Figure~\ref{fig:system1} shows the overall system. As the same as most artificial intelligent systems, the whole system consists of two parts: an agent and an environment. 
+            Figure~\ref{fig:system1} shows the overall system. As the same as most artificial intelligent systems, the whole system consists of two parts: an agent and an environment.
             \begin{figure}[h]
                 \centering
                 \includegraphics[width=\textwidth]{agent_env.png}
                 \caption{\label{fig:system1}Overall System.}
             \end{figure}
             
-            The environment consists of a simulated LEGO environment and a renderer. The simulated LEGO environment offers the agent actions. According to the action commands sent from the agent, LEGO models can be rigged up in the simulated LEGO environment. The simulated LEGO environment can also import a model from a \textit{.lxfml} or \textit{.lxf} file, or export the current model to a \textit{.lxfml} or \textit{.lxf} file. The renderer can then input a \textit{.lxfml} or \textit{.lxf} file, and then render the model into an image which can be percepted by the agent. 
+            The environment consists of a simulated LEGO environment and a renderer. The simulated LEGO environment offers the agent actions. According to the action commands sent from the agent, LEGO models can be rigged up in the simulated LEGO environment. The simulated LEGO environment can also import a model from a \textit{.lxfml} or \textit{.lxf} file, or export the current model to a \textit{.lxfml} or \textit{.lxf} file. The renderer can then input a \textit{.lxfml} or \textit{.lxf} file, and then render the model into an image which can be perceived by the agent. 
+            
+            The agent consists of a reward function, a deep Q-network and a replay (experience) pool. The reward function evaluates the difference between the model which the agent has already rigged up and the target model. The deep Q-network is the core of the whole algorithm, which tells the agent Q-values of each action at each state. Replays (experiences) in the pool can be randomly picked to train the network. 
+            
+            The inter-communication between modules can be illustrated by 
+            
+            
+            
+            \begin{algorithm}
+                \caption{LEGO with deep Q-learning (at the early stage)} \label{alg:lego1}
+                \begin{algorithmic}
+                    \State Get hyper-parameters
+                    \State Initialise replay memory $D$ to capacity $N$
+                    \State Initialise action-value function $Q$ with random weights $\theta$
+                    \State Initialise target action-value function $\hat{Q}$ with weights $\theta^- = \theta$
+                    \State Input a target model $M_target$ to the agent and the environment
+                    \State Initialise a neural network $Net$ with random parameters
+                    \State Initialise Q-values for each state-action pair
+
+                    
+                    \For {$episode = 1, M$}
+                        \State Generate an initial model $M_1$ in the environment
+                        \State The agent gets the initial model $M_1$ from the environment
+                        \State Acquire an image $x_1$ of $M_1$ from the environment
+                        \For{$t=1,N$}
+                            \State Pass $x_t$ to $Net$ to get Q-values $Q$
+                            \State With probability $\epsilon$ select a random action $a_t$
+                            \State otherwise select $a_t = \argmax_a Q(\phi(s_t), a;\theta)$
+                            \State Translate the selected action $a_t$ to a command $(brick, axis, direction)$
+                            \State Passes the command $(brick, axis, direction)$ to the environment
+                            \State Acquire the next model $M_{t+1}$ and a corresponding image $x_{t+1}$
+                            \State Pass $M_target$ and $M_{t+1}$ to the reward function
+                            \State Get a reward $r_t$ and a terminating flag $terminate$
+                            \State Set $s_{t+1} = s_t,a_t,x_{t+1}$ and preprocess $\phi_{t+1}=\phi(s_{t+1})$
+                            \State Store transition ($\phi_t,a_t,r_t,\phi_{t+1}$) in $D$
+                            \State Sample random mini-batch of transitions ($\phi_j,a_j,r_j,\phi_{j+1}$) from $D$
+                            \State Set $
+                                    y_j= 
+                                    \begin{cases}
+                                        r_j    & \parbox[t]{.15\textwidth}{\text{episode terminates at step } j+1}\\
+                                        r_j+\gamma\max_{a'}\hat{Q}(\phi_{j+1},a';\theta^-) & \text{otherwise}
+                                    \end{cases}
+                                    $
+                            \State Perform a gradient descent step on $(y_j-Q(\phi_j,a_j;\theta))^2$ with respect
+                            \StatexIndent[2] to the network parameters $\theta$
+                            \State Every $C$ steps reset $\hat{Q} \gets Q$
+                            \State Store statistics
+                            \If {$terminate$ == 0}  
+                                \State Break the loop 
+                            \EndIf
+                            
+                        \EndFor
+                        
+                        \If{$episode \mod Ntest == 0$}
+                            \State \textbf{Test(\text{$M_{target}, Net$})} \Comment{Test the agent using the trained network}
+                            \State Store statistics 
+                            % \State Generate an initial model $M_1$ in the environment
+                            % \State The agent gets the initial model $M_1$ from the environment
+                            % \State Acquire an image $x_1$ of $M_1$ from the environment
+                            % \For{$t=1,N$}
+                            %     \State Pass $x_t$ to $Net$ to get Q-values $Q$
+                            %     \State Select $a_t = \argmax_a Q(\phi(s_t), a;\theta)$
+                            %     \State Translate the selected action $a_t$ to a command $(brick, axis, direction)$
+                            %     \State Passes the command $(brick, axis, direction)$ to the environment
+                            %     \State Acquire the next model $M_{t+1}$ and a corresponding image $x_{t+1}$
+                            %     \State Pass $M_target$ and $M_{t+1}$ to the reward function
+                            %     \State get a reward $r_t$ and a terminating flag $terminate$
+                            %     \State Store the statistics
+                            %     \If {$terminate$ == 0}  
+                            %         \State Break the loop 
+                            %     \EndIf
+                                
+                            % \EndFor
+                        \EndIf
+                    \EndFor
+                \end{algorithmic}
+            \end{algorithm}
+            
+            \begin{algorithm}
+                \caption{Testing procedure (at the early stage)} \label{alg:test1}
+                \begin{algorithmic}
+                    \Procedure{\textbf{Test}}{$M_{target}, Net$}
+                        \State Pass the target model $M_{target}$ to the environment
+                        \State Generate an initial model $M_1$ in the environment
+                        \State The agent gets the initial model $M_1$ from the environment
+                        \State Acquire an image $x_1$ of $M_1$ from the environment
+                        \For{$t=1,N$}
+                            \State Pass $x_t$ to $Net$ to get Q-values $Q$
+                            \State Select $a_t = \argmax_a Q(\phi(s_t), a;\theta)$
+                            \State Translate the selected action $a_t$ to a command $(brick, axis, direction)$
+                            \State Passes the command $(brick, axis, direction)$ to the environment
+                            \State Acquire the next model $M_{t+1}$ and a corresponding image $x_{t+1}$
+                            \State Pass $M_target$ and $M_{t+1}$ to the reward function
+                            \State Get a reward $r_t$ and a terminating flag $terminate$
+                            \State Store the statistics
+                            \If {$terminate$ == 0}  
+                                \State Break the loop 
+                            \EndIf
+                            
+                        \EndFor
+                    \EndProcedure
+                \end{algorithmic}
+            \end{algorithm}
+            
+            \newpage
+
+            
+            
+            
+            
             
             % \let\labelitemi\labelitemii
 
@@ -431,17 +540,28 @@
         
         \subsection{Agent}
         
+            In the first stage of the project, after a target model has been inputted into the environment, the environment generates a initial model which consists of every brick in the target model in random positions. At each time step, the agent may move a brick along an axis in a direction by 1 unit. The action space $A$ has a cardinality of $|Bricks| \times |Axis| \times 2$. 
         
-        \subsection{Deep Q Network}
+        
+        \subsection{Deep Q-Network}
+            
+            In the first stage of the project, the Q-network is much simpler than it in the later stage. The network takes an image with 4 channels as an input, and outputs Q-values for each action. Between the input layer and the output layer, there are 5 hidden layers. 
+            
+            In the later stage of the project, in addition to the image, the network also takes an one-hot encoded value, representing the index of the colour of a brick to be added into the model. For example, if the agent tries to add a red brick where the index of red is 2, the input is an image of current state and a one-hot value $010...0$. The output of the network also changes. This time, there are three output layers. Each layer represents the coordinate on an axis, so the three layers together give the coordinates which a brick of the colour should be put on. 
         
         
         \subsection{LEGO Environment}
         
         
-        \subsection{Render}
+        \subsection{Renderer}
+        
+            Since I am using Blender to render and Blender only supports Python, the renderer is written in Python and the other modules can call the renderer through command line and transfer files using hard drive or network socket. 
+            
+            In order to save memory, and for convenience, I extracted every brick's 3D model from the LEGO digital designer and saved them as \textit{.obj} files on hard drive. I also stored some colour information and texture information for each kind of simple bricks into a table. When the renderer needs to render a specific brick with a specific colour or texture, it can import the corresponding \textit{.obj} file from the disk and fetch the texture from the table. 
+            
+            
         
         
-        \subsection{Interaction}
     
     \section{Testing}
     
