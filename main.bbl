@@ -1,0 +1,114 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{MKS{\etalchar{+}}15}
+
+\bibitem[Ben09]{Bengio_2009}
+Y.~Bengio.
+\newblock Learning deep architectures for {AI}.
+\newblock {\em Foundations and Trends{\textregistered} in Machine Learning},
+  2(1):1--127, 2009.
+
+\bibitem[Dee]{DQN}
+DeepMind.
+\newblock Dqn.
+\newblock Website.
+\newblock \url{https://deepmind.com/research/dqn/}.
+
+\bibitem[DY14]{deep-learning-methods-and-applications}
+Li~Deng and Dong Yu.
+\newblock Deep learning: Methods and applications.
+\newblock Technical report, Microsoft, May 2014.
+\newblock
+  \url{https://www.microsoft.com/en-us/research/publication/deep-learning-methods-and-applications/}.
+
+\bibitem[GBC16]{Goodfellow-et-al-2016}
+Ian Goodfellow, Yoshua Bengio, and Aaron Courville.
+\newblock {\em Deep Learning}.
+\newblock MIT Press, 2016.
+\newblock \url{http://www.deeplearningbook.org}.
+
+\bibitem[Lau16]{flappy-bird1}
+Ben Lau.
+\newblock Using keras and deep q-network to play flappybird.
+\newblock Website, 07 2016.
+\newblock \url{https://yanpanlau.github.io/2016/07/10/FlappyBird-Keras.html}.
+
+\bibitem[LBH15]{Deep-Learning}
+Yann LeCun, Yoshua Bengio, and Geoffrey Hinton.
+\newblock Deep learning.
+\newblock {\em Nature}, 521(7553):436--444, may 2015.
+
+\bibitem[ldd]{ldd}
+Lego digital designer.
+\newblock Website.
+\newblock \url{http://ldd.lego.com/}.
+
+\bibitem[Lin16]{flappy-bird2}
+Yenchen Lin.
+\newblock Using deep q-network to learn how to play flappy bird.
+\newblock Website, 03 2016.
+\newblock \url{https://github.com/yenchenlin/DeepLearningFlappyBird}.
+
+\bibitem[MKS{\etalchar{+}}15]{human-level}
+Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei~A. Rusu, Joel Veness,
+  Marc~G. Bellemare, Alex Graves, Martin Riedmiller, Andreas~K. Fidjeland,
+  Georg Ostrovski, Stig Petersen, Charles Beattie, Amir Sadik, Ioannis
+  Antonoglou, Helen King, Dharshan Kumaran, Daan Wierstra, Shane Legg, and
+  Demis Hassabis.
+\newblock Human-level control through deep reinforcement learning.
+\newblock {\em Nature}, 518(7540):529--533, feb 2015.
+
+\bibitem[PMLF13]{tvl1}
+Javier~S{\'{a}}nchez P{\'{e}}rez, Enric Meinhardt-Llopis, and Gabriele
+  Facciolo.
+\newblock {TV}-l1 optical flow estimation.
+\newblock {\em Image Processing On Line}, 3:137--150, jul 2013.
+\newblock \url{http://www.ipol.im/pub/art/2013/26/}.
+
+\bibitem[SB98]{intro-rl}
+Richard~S. Sutton and Andrew~G. Barto.
+\newblock {\em Reinforcement Learning: An Introduction}.
+\newblock The MIT Press, 1998.
+
+\bibitem[Sch]{Schm14}
+Juergen Schmidhuber.
+\newblock Deep learning in neural networks: An overview.
+
+\bibitem[Sch15]{Schmidhuber_2015}
+Juergen Schmidhuber.
+\newblock Deep learning.
+\newblock {\em Scholarpedia}, 10(11):32832, 2015.
+
+\bibitem[SDM97]{Schultz_1997}
+W.~Schultz, P.~Dayan, and P.~R. Montague.
+\newblock A neural substrate of prediction and reward.
+\newblock {\em Science}, 275(5306):1593--1599, mar 1997.
+
+\bibitem[Sil16]{Deep-RL}
+David Silver.
+\newblock Deep reinforcement learning.
+\newblock Blog, 06 2016.
+\newblock \url{https://deepmind.com/blog/deep-reinforcement-learning/}.
+
+\bibitem[Tho98]{thorndike1898animal}
+E.L. Thorndike.
+\newblock {\em Animal Intelligence: An Experimental Study of the Associative
+  Processes in Animals}.
+\newblock Number no. 4 in Animal Intelligence: An Experimental Study of the
+  Associative Processes in Animals. Macmillan, 1898.
+
+\bibitem[vHGS15]{doubleQ}
+Hado van Hasselt, Arthur Guez, and David Silver.
+\newblock Deep reinforcement learning with double q-learning.
+\newblock {\em arXiv}, 2015.
+
+\bibitem[Wat89]{Watkins:1989}
+Christopher John Cornish~Hellaby Watkins.
+\newblock {\em Learning from Delayed Rewards}.
+\newblock PhD thesis, King's College, Cambridge, UK, May 1989.
+
+\bibitem[WD92]{Q-l}
+CHRISTOPHER~J.C.H. WATKINS and PETER DAYAN.
+\newblock Technical note:q-learning.
+\newblock Technical report, Kluwer Academic Publishers, 1992.
+
+\end{thebibliography}
